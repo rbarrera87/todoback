@@ -18,20 +18,53 @@ app.get('/todos', function (req, res){
   });
 });
 
+//POST: /todos
 app.post('/todos', function (req, res){
-  console.log("entra");
   if (req.body.name) {
-    console.log("if");
     Todo.findOrCreate({
       name: req.body.name
     }, function (err, docs){
-      console.log("callback");
       if (err) {
-        console.log("error");
         res.send(req.body);
       }
       res.send(req.body)
     });
+  }
+});
+
+//DELETE /todos
+app.delete('/todos', function (req, res){
+  if (req.body._id) {
+    Todo.remove({_id: req.body._id}, function (err, todo){
+      res.send(req.body);
+    });
+  }else{
+    res.status(500).send('You should send and _id');
+  }
+});
+
+//post DELETE Everything just in development mode
+app.post('/todos/removeall', function (req, res) {
+  Todo.find({}, function(err, todos){
+    todos.forEach(function(todo){
+      todo.remove();
+    });
+  });
+  res.send("TODOs were deleted");
+});
+
+//PUT /todos/:id
+app.put('/todos', function (req, res){
+  if (req.body._id) {
+    Todo.update({_id: req.body._id}, {name: req.body.name}, function (err, todo){
+      if (err) {
+        res.send(err);
+      }else{
+        res.send(todo);
+      }
+    });
+  }else{
+    res.status(500).send('You should send and _id');
   }
 });
 
